@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  ai-analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile.malware
+    ports:
+      - "8080:8080"
+    # ÖDEV HATASI: Host makinenin Docker soketinin bağlanması (Container Escape Riski)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    # ÖDEV HATASI: Host sistemin işlem tablosuna erişim
+    pid: "host"
+    restart: always
+
+  malware-storage:
+    image: redis:6.0 # ÖDEV HATASI: Eski ve zafiyetli imaj
+    ports:
+      - "6379:6379"

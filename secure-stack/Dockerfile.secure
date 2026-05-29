@@ -1,0 +1,21 @@
+# Güvenli, minimal ve optimize edilmiş base imaj seçildi
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Sadece gerekli güvenlik yamaları yapılıyor, sudo/curl gibi tehlikeli araçlar yüklenmiyor
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Root olmayan, tamamen yetkisiz düz bir sistem kullanıcısı yaratılıyor
+RUN useradd -u 10001 -m security_user && chown -R security_user:security_user /app
+USER security_user
+
+EXPOSE 8080
+
+CMD ["python3", "analyzer.py"]

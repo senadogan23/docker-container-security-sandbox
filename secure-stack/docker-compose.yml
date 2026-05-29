@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  ai-analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile.secure
+    ports:
+      - "127.0.0.1:8080:8080" # Sadece yerel hosttan erişim, dış dünyaya kapalı
+    environment:
+      - AI_TOKEN=${CRITICAL_AI_TOKEN} # .env dosyasından güvenli okuma
+    networks:
+      - secure-cyber-net
+    security_opt:
+      - no-new-privileges:true # Sudo ve yetki yükseltmeyi kesin olarak engeller
+    cap_drop:
+      - ALL
+
+  malware-storage:
+    image: redis:7.2-alpine # Güncel, hafif ve güvenli imaj
+    # PORTS tamamen kaldırıldı. Dış ağdan erişim imkansız.
+    networks:
+      - secure-cyber-net
+
+networks:
+  secure-cyber-net:
+    driver: bridge
+    internal: true # Dış dünya ile internet bağını tamamen kesen izole iç ağ
